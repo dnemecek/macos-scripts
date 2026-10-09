@@ -12,26 +12,34 @@ Rodina shell skriptů pro každodenní správu macOS: import fotek, zálohy, úd
 | `bin/macos-maintenance.sh` | Údržba macOS — aktualizace, čištění cache, report stavu. |
 | `bin/http2-test.sh` | Diagnostika HTTP/2 pro lokalitu. |
 | `bin/mtu-discover.sh` | Zjištění MTU k cíli. |
-| `bin/claude-rc.sh` | Claude Code Remote Control server ve screenu na pozadí (`start`/`attach`/`stop`/`status`), ovládání sessions z mobilu nebo claude.ai/code. Název `<počítač> - <složka>`, počítač lze přepsat `CLAUDE_RC_HOST`. Volitelně jako služba launchd (`install`/`uninstall`), viz níže. |
+| `bin/claude-rc.sh` | Claude Code Remote Control server jako služba launchd: sessions z mobilu nebo claude.ai/code. Název `<počítač> - <složka>`. Config `claude-rc.conf` (vzor `bin/claude-rc.conf.example`). Viz níže. |
 
 ## claude-rc jako služba (launchd)
 
-`claude-rc.sh install [DIR]` vytvoří LaunchAgent `~/Library/LaunchAgents/cz.nemecek.claude-rc.<složka>.plist`
-a načte ho (`launchctl bootstrap gui/<uid>`). Server se pak spustí po každém přihlášení a po pádu
-(KeepAlive, pauza 30 s). Běží dál ve screenu, takže `attach` a `status` fungují stejně.
+Server běží nad složkou serveru (obsahuje workspaces, výchozí `~/Documents/Source/Repos`).
+`install` vytvoří LaunchAgent `~/Library/LaunchAgents/<labelPrefix>.<složka>.plist`; launchd pak
+server spustí po každém přihlášení a po pádu (pauza 30 s). Při každém startu launchd volá
+`claude-rc.sh run DIR`, který ověří složku serveru a pak se nahradí procesem `claude remote-control`.
 
 ```bash
-claude-rc.sh start   ~/Documents/Source/Repos   # 1. první spuštění ve složce ručně
-claude-rc.sh attach  ~/Documents/Source/Repos   #    potvrdit důvěru složky a Remote Control, Ctrl-A D
-claude-rc.sh stop    ~/Documents/Source/Repos
-claude-rc.sh install ~/Documents/Source/Repos   # 2. služba
-claude-rc.sh uninstall ~/Documents/Source/Repos # zrušení služby
+cp bin/claude-rc.conf.example ~/bin/claude-rc.conf   # config vedle skriptu, upravit hostName
+claude-rc.sh init        # 1. první spuštění ve složce: potvrdit důvěru a Remote Control, pak Ctrl+C
+claude-rc.sh install     # 2. služba (instalovat z ~/bin, plist ukazuje na cestu skriptu)
+claude-rc.sh status      # stav, PID, poslední exit code; chybějící složku označí MISSING
+claude-rc.sh restart | stop | start
+claude-rc.sh uninstall   # zrušení služby
 ```
 
+- Config: řádky `klíč=hodnota` (`serverDir`, `hostName`, `labelPrefix`), soubor se nespouští.
+  Pořadí: parametr DIR > proměnná prostředí (`CLAUDE_RC_DIR`, `CLAUDE_RC_HOST`, `CLAUDE_RC_LABEL`)
+  > config > výchozí hodnota. Změna `hostName` nebo `labelPrefix` platí až po `install`.
+- Bez terminálu se `claude remote-control` nemůže zeptat na důvěru složky a skončí chybou
+  `Workspace not trusted`; proto nejdřív `init`.
 - `stop` službu vyjme z launchd do dalšího přihlášení nebo `start`; trvale ji zruší `uninstall`.
+  `stop`, `uninstall` a `status` fungují i pro smazanou složku serveru.
 - LaunchAgent běží jen po přihlášení uživatele. Mac bez monitoru po restartu potřebuje
   automatické přihlášení, jinak se server nespustí.
-- Log launchd/screen: `~/Library/Logs/cz.nemecek.claude-rc.<složka>.log`.
+- Log: `~/Library/Logs/<labelPrefix>.<složka>.log` (práva 600, obsahuje odkazy na sessions).
 
 ## Nasazení do ~/bin
 
