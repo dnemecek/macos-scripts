@@ -1,0 +1,28 @@
+# ============================================================================
+# claude-rc.conf -- nastaveni pro claude-rc.sh (Remote Control server jako sluzba)
+# ============================================================================
+# Pouziti: zkopirovat vedle claude-rc.sh jako claude-rc.conf a upravit.
+#          Jina cesta: promenna CLAUDE_RC_CONFIG.
+# Format:  radky klic=hodnota; komentare #; uvozovky kolem hodnoty volitelne;
+#          ~ nebo $HOME na zacatku cesty se rozvine. Soubor se nespousti.
+# Poradi:  parametr DIR > promenna prostredi > tento config > vychozi hodnota
+# POZOR:   zmena hostName nebo labelPrefix plati az po "claude-rc.sh install"
+#          (hodnoty se ukladaji do plistu sluzby).
+# ============================================================================
+
+# serverDir: Slozka, nad kterou server bezi (obsahuje workspaces), kdyz prikaz nedostane DIR
+# Duvod: Absolutni cesta; jinak skript skonci chybou
+# Prostredi: CLAUDE_RC_DIR
+serverDir=~/Documents/Source/Repos
+
+# hostName: Nazev pocitace v seznamu sessions ("<hostName> - <slozka>") a prefix novych sessions
+# Duvod: LocalHostName byva dlouhy (napr. Davids-MacBook-Air); 1-63 znaku A-Z a-z 0-9 mezera . _ -
+# Prostredi: CLAUDE_RC_HOST
+# Priklad: hostName=Air
+#hostName=
+
+# labelPrefix: Prefix labelu sluzby launchd a nazvu plistu v ~/Library/LaunchAgents
+# Duvod: Reverse-DNS; label sluzby je <labelPrefix>.<nazev slozky>
+# Prostredi: CLAUDE_RC_LABEL
+# POZOR: Pred zmenou odinstalovat sluzby se starym prefixem (claude-rc.sh uninstall DIR)
+#labelPrefix=local.claude-rc

@@ -28,3 +28,6 @@ local/
 # IDE
 .vscode/
 .idea/
+
+# Lokalni config skriptu (vzor: *.conf.example)
+bin/*.conf
