@@ -12,7 +12,7 @@ Rodina shell skriptů pro každodenní správu macOS: import fotek, zálohy, úd
 | `bin/macos-maintenance.sh` | Údržba macOS — aktualizace, čištění cache, report stavu. |
 | `bin/http2-test.sh` | Diagnostika HTTP/2 pro lokalitu. |
 | `bin/mtu-discover.sh` | Zjištění MTU k cíli. |
-| `bin/claude-rc.sh` | Claude Code Remote Control server ve screenu na pozadí (`start`/`attach`/`stop`/`status`), ovládání sessions z mobilu nebo claude.ai/code. Název `<počítač> · <složka>`, počítač lze přepsat `CLAUDE_RC_HOST`. |
+| `bin/claude-rc.sh` | Claude Code Remote Control server ve screenu na pozadí (`start`/`attach`/`stop`/`status`), ovládání sessions z mobilu nebo claude.ai/code. Název `<počítač> - <složka>`, počítač lze přepsat `CLAUDE_RC_HOST`. |
 
 ## Nasazení do ~/bin
 
